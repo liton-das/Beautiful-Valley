@@ -107,10 +107,20 @@ const loginController = async(req,res)=>{
         return responseHeader.error(res)
     }
 }
-// 
+// get single user 
+const getsingleUserController = async(req,res)=>{
+    try {
+        const currentUser = await User.findById(req.user._id).select('fullName email role phone isActive avatar')
+        if(!currentUser) return responseHeader.error(res,'User not found!',404)
+        return responseHeader.success(res,'user data fetch done',currentUser)
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+}
 module.exports = {
     registerUserController,
     verifyOtpController,
     resendOtpController,
-    loginController
+    loginController,
+    getsingleUserController
 }

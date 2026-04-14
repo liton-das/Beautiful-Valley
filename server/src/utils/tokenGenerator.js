@@ -1,16 +1,16 @@
 const jwt = require('jsonwebtoken')
-const accessTokenGenerator = (id,role,email)=>{
+const accessTokenGenerator = (_id,role,email)=>{
     return jwt.sign({
-        _id:id,
+        _id,
         role,
         email
     },process.env.SECRET_TOKEN,{
         expiresIn:'1h'
     })
 }
-const refreshTokenGenerator=(id,role,email)=>{
+const refreshTokenGenerator=(_id,role,email)=>{
     return jwt.sign({
-        _id:id,
+        _id,
         role,
         email
     },process.env.SECRET_TOKEN,{

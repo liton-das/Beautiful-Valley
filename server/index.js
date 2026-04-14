@@ -1,15 +1,18 @@
 const express = require('express')
 const dbConnection = require('./src/config/dbConnection')
 const cors = require('cors')
-const cookie = require('cookie-parser')
+const cookieParser = require('cookie-parser')
 const { otpGenerator } = require('./src/utils/otpGenerator')
 const router = require('./src/routes')
 const app = express()
 require('dotenv').config()
 const PORT = process.env.PORT || 4000
-app.use(cors())
 app.use(express.json())
-app.use(cookie())
+app.use(cookieParser())
+app.use(cors({
+    origin:'',
+    credentials:true
+}))
 // Db connection 
 dbConnection()
 // rotue 
