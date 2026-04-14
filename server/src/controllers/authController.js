@@ -107,7 +107,7 @@ const loginController = async(req,res)=>{
         return responseHeader.error(res)
     }
 }
-
+// 
 module.exports = {
     registerUserController,
     verifyOtpController,
