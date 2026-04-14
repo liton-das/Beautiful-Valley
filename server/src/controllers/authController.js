@@ -150,6 +150,17 @@ const logoutController = async(req,res)=>{
         return responseHeader.error(res)
     }
 }
+// search controller 
+const searchUserController =async(req,res)=>{
+    try {
+        const items = req.query.items
+        const searchItems = await User.find({$or:[{fullName:{$regex:items,$options:'i'}}]}).select('fullName email phone role isActive avatar createdAt updatedAt')
+        if(!searchItems) return responseHeader.error(res,'Search items not found!',404)
+        return responseHeader.success(res,'serch items fetch success',searchItems,200)
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+}
 module.exports = {
     registerUserController,
     verifyOtpController,
@@ -157,5 +168,6 @@ module.exports = {
     loginController,
     getsingleUserController,
     getAllUserByAdminController,
-    logoutController
+    logoutController,
+    searchUserController
 }
