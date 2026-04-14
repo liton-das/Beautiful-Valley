@@ -140,11 +140,22 @@ const getAllUserByAdminController =async(req,res)=>{
         return responseHeader.error(res)
     }
 }
+// logout controller 
+const logoutController = async(req,res)=>{
+    try {
+        res.clearCookie('X-Access_Token')
+        res.clearCookie('X-Refresh_Token')
+        return responseHeader.success(res,'Logout successfully',200)
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+}
 module.exports = {
     registerUserController,
     verifyOtpController,
     resendOtpController,
     loginController,
     getsingleUserController,
-    getAllUserByAdminController
+    getAllUserByAdminController,
+    logoutController
 }
