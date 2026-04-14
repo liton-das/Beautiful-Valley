@@ -53,7 +53,29 @@ const verifyOtpController = async(req,res)=>{
         return responseHeader.error(res)
     }
 }
+// resend otp controller
+const resendOtpController=async(req,res)=>{
+    try {
+        const {email} = req.body
+        if(!email) return responseHeader.error(res,'Email field is required!',400)
+        const existUser = await User.findOne({email})
+        if(!existUser) return responseHeader.error(res,'Invalid your email!',400)
+        if(existUser.otp === null) return responseHeader.error(res,'You are already verifyed user',400)
+        if(existUser.isVerify === true) return responseHeader.error(res,'Your otp already verifyed!',400)
+        const newOtp = otpGenerator(6)
+        existUser.otp = newOtp
+        existUser.otpExpireTime = Date.now() + 10 * 60 * 1000
+        existUser.isVerify = false
+        await existUser.save()
+        sendMailToUser(email,`Otp send to your this email:${email}`,existUser.fullName,newOtp,existUser.otpExpireTime)
+        return responseHeader.success(res,'Resend otp successfully',200)
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+
+}
 module.exports = {
     registerUserController,
-    verifyOtpController
+    verifyOtpController,
+    resendOtpController
 }
