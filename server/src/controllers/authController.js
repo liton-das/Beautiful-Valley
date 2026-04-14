@@ -117,10 +117,34 @@ const getsingleUserController = async(req,res)=>{
         return responseHeader.error(res)
     }
 }
+// get all user by admin
+const getAllUserByAdminController =async(req,res)=>{
+    try {
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 10
+        const skip = (page - 1) * limit
+        const totalCount = await User.countDocuments()
+        const users = await User.find().sort({createdAt:-1}).skip(skip).limit(limit).select('fullName email phone avatar role isActive createdAt updatedAt')
+        if(!users)return responseHeader.error(res,'Users not found!',404)
+        const simplify = {
+            users,
+            pagination:{
+                page,
+                limit,
+                totalItems:totalCount,
+                pages:Math.ceil(totalCount / limit)
+            }
+        }
+        return responseHeader.success(res,'Users data fetch success ',simplify)
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+}
 module.exports = {
     registerUserController,
     verifyOtpController,
     resendOtpController,
     loginController,
-    getsingleUserController
+    getsingleUserController,
+    getAllUserByAdminController
 }
