@@ -36,7 +36,24 @@ const registerUserController=async(req,res)=>{
         return responseHeader.error(res)
     }
 }
-
+// verify otp controller 
+const verifyOtpController = async(req,res)=>{
+    try {
+        const {email,otp} = req.body
+        if(!email) return responseHeader.error(res,'Email field is required!',400)
+        if(!otp) return responseHeader.error(res,'Otp field is required!',400)
+        const existOtp = await User.findOne({email,otp,otpExpireTime:{$gt:Date.now()}})
+        if(!existOtp) return responseHeader.error(res,'Invalid or Expire Otp!',400)
+        existOtp.otp = null
+        existOtp.otpExpireTime = null
+        existOtp.isVerify = true
+        await existOtp.save()
+        return responseHeader.success(res,'Otp verify successfully',200)
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+}
 module.exports = {
-    registerUserController
+    registerUserController,
+    verifyOtpController
 }
