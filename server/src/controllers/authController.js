@@ -1,7 +1,9 @@
 const User = require("../model/User")
 const sendMailToUser = require("../utils/mailer")
 const { otpGenerator } = require("../utils/otpGenerator")
+const { emailRegex, passwordRegex } = require("../utils/regexGenerator")
 const { responseHeader } = require("../utils/responseHeader")
+const { accessTokenGenerator, refreshTokenGenerator } = require("../utils/tokenGenerator")
 
 // register user controller
 const registerUserController=async(req,res)=>{
@@ -9,6 +11,8 @@ const registerUserController=async(req,res)=>{
         const {fullName,email,phone,password,role,isActive}=req.body
         // check validation 
         if(!fullName) return responseHeader.error(res,'FullName field is required!',404)
+        if(!emailRegex.test(email)) return responseHeader.error(res,'Invalid your email!',400)
+        if(!passwordRegex.test(password)) return responseHeader.error(res,'Invalid your password')
         if(!email) return responseHeader.error(res,'Email field is required!',404)
         if(!phone) return responseHeader.error(res,'phone field is required!',404)
         if(!password) return responseHeader.error(res,'password field is required!',404)
@@ -57,6 +61,7 @@ const verifyOtpController = async(req,res)=>{
 const resendOtpController=async(req,res)=>{
     try {
         const {email} = req.body
+        if(!emailRegex.test(email)) return responseHeader.error(res,'Invalid your email!',400)
         if(!email) return responseHeader.error(res,'Email field is required!',400)
         const existUser = await User.findOne({email})
         if(!existUser) return responseHeader.error(res,'Invalid your email!',400)
@@ -74,8 +79,38 @@ const resendOtpController=async(req,res)=>{
     }
 
 }
+// login controller 
+const loginController = async(req,res)=>{
+    try {
+        const {email,password}=req.body
+        if(!emailRegex.test(email)) return responseHeader.error(res,'Invalid creadintails!',400)
+        if(!passwordRegex.test(password)) return responseHeader.error(res,'Invalid creadintials!',400)
+        if(!email) return responseHeader.error(res,'Email field is required!',400)
+        if(!password) return responseHeader.error(res,'Password field is required!',400)
+        const existUser = await User.findOne({email})
+        const isMatch = await existUser.verifyPassword(password)
+        if(!isMatch) return responseHeader.error(res,'Invalid creadintials!',400)
+        if(!existUser) return responseHeader.error(res,'Invalid creadintials!',400)
+        const access_token = accessTokenGenerator(existUser._id,existUser.role,existUser.email) 
+        const refresh_token = refreshTokenGenerator(existUser._id,existUser.role,existUser.email) 
+        res.cookie('X-Access_Token',access_token,{
+            httpOnly:true,
+            sameSite:'none',
+            secure:true,
+        }).cookie('X-Refresh_Token',refresh_token,{
+            httpOnly:true,
+            sameSite:'none',
+            secure:true
+        })
+        return responseHeader.success(res,'Login successfully',200)
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+}
+
 module.exports = {
     registerUserController,
     verifyOtpController,
-    resendOtpController
+    resendOtpController,
+    loginController
 }
