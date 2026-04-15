@@ -1,0 +1,55 @@
+const { default: mongoose } = require("mongoose");
+
+const RoomSchema = new mongoose.Schema({
+    title:{
+        type:String,
+        required:true
+    },
+    slug:{
+        type:String,
+        required:true,
+        unique : true
+    },
+    roomNumber:{
+        type:Number,
+        default:null,
+        unique:true
+    },
+    roomStatus:{
+        type:String,
+        enum:['available','booked','calcel'],
+        default:'available'
+    },
+    roomImg:{
+        type:String,
+        default:null
+    },
+    roomVideo:{
+        type:String,
+        default:null
+    },
+    description:{
+        type:String,
+        required:true
+    },
+    price:{
+        type:Number,
+        required:true
+    },
+    discount:{
+        type:Number,
+        default:0
+    },
+    finalPrice:{
+        type:Number
+    },
+    bookingDate:{
+        type:Date,
+        default:null
+    },
+    bookingCancelDate:{
+        type:Date,
+        default:null
+    }
+},{timestamps:true})
+module.exports=mongoose.model('Room',RoomSchema)
