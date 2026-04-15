@@ -212,6 +212,17 @@ const resetPasswordController = async(req,res)=>{
         return responseHeader.error(res)
     }
  }
+// delete single user controller
+ const deleteSingleUserByAdminController = async(req,res)=>{
+    try {
+        const {id} = req.params
+        const existUser = await User.findOneAndDelete({_id:id})
+        if(!existUser) return responseHeader.error(res,'User not found!',404)
+        return responseHeader.success(res,'User deleted successfully')
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+ }
 module.exports = {
     registerUserController,
     verifyOtpController,
@@ -223,5 +234,6 @@ module.exports = {
     searchUserController,
     forgotPasswordController,
     resetPasswordController,
-    deleteSingleUserController
+    deleteSingleUserController,
+    deleteSingleUserByAdminController
 }
