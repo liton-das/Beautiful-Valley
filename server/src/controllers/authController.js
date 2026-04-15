@@ -3,7 +3,7 @@ const sendMailToUser = require("../utils/mailer")
 const { otpGenerator } = require("../utils/otpGenerator")
 const { emailRegex, passwordRegex } = require("../utils/regexGenerator")
 const { responseHeader } = require("../utils/responseHeader")
-const { accessTokenGenerator, refreshTokenGenerator } = require("../utils/tokenGenerator")
+const { accessTokenGenerator, refreshTokenGenerator, resetPasswordToken } = require("../utils/tokenGenerator")
 
 // register user controller
 const registerUserController=async(req,res)=>{
@@ -161,6 +161,25 @@ const searchUserController =async(req,res)=>{
         return responseHeader.error(res)
     }
 }
+// forgot password controller 
+const forgotPasswordController = async(req,res)=>{
+    try {
+        const {email} = req.body
+        if(!email) return responseHeader.error(res,'Email field is required!',400)
+        if(!emailRegex.test(email)) return responseHeader.error(res,'Invalid your email!',400)
+        const existUser = await User.findOne({email})
+        if(!existUser) return responseHeader.error(res,'This email not exist!',404)
+        const {resetPasswordLink,hashToken} = resetPasswordToken()
+        const clientUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetPasswordLink}`
+        existUser.resetPasswordToken = hashToken
+        existUser.resetPasswordTokenExpireTime = Date.now() + 10 * 60 * 1000
+        await existUser.save()
+        sendMailToUser(email,'Reset Password Link:',existUser.fullName,clientUrl,existUser.resetPasswordTokenExpireTime)
+        return responseHeader.success(res,'Reset password link send to your email','',200)
+    } catch (e) {
+        return responseHeader.error(res)
+    }
+}
 module.exports = {
     registerUserController,
     verifyOtpController,
@@ -169,5 +188,6 @@ module.exports = {
     getsingleUserController,
     getAllUserByAdminController,
     logoutController,
-    searchUserController
+    searchUserController,
+    forgotPasswordController
 }

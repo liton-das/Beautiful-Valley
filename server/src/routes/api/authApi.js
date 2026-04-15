@@ -1,4 +1,4 @@
-const { registerUserController, verifyOtpController, resendOtpController, loginController, getsingleUserController, getAllUserByAdminController, logoutController, searchUserController } = require('../../controllers/authController')
+const { registerUserController, verifyOtpController, resendOtpController, loginController, getsingleUserController, getAllUserByAdminController, logoutController, searchUserController, forgotPasswordController } = require('../../controllers/authController')
 const { authMiddleware } = require('../../middlewares/authMiddleware')
 const roleCheckMiddleware = require('../../middlewares/roleCheckMiddleware')
 
@@ -12,6 +12,7 @@ authApi.get('/v1/get-single-user',authMiddleware,getsingleUserController)
 authApi.get('/v1/get-all-users',authMiddleware,roleCheckMiddleware("admin"),getAllUserByAdminController)
 authApi.post('/v1/logout',logoutController)
 authApi.get('/v1/search-users',searchUserController)
+authApi.post('/v1/forgot-password',forgotPasswordController)
 
 
 
