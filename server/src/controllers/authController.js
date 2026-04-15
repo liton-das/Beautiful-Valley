@@ -3,6 +3,7 @@ const sendMailToUser = require("../utils/mailer")
 const { otpGenerator } = require("../utils/otpGenerator")
 const { emailRegex, passwordRegex } = require("../utils/regexGenerator")
 const { responseHeader } = require("../utils/responseHeader")
+const crypto = require('crypto');
 const { accessTokenGenerator, refreshTokenGenerator, resetPasswordToken } = require("../utils/tokenGenerator")
 
 // register user controller
@@ -170,13 +171,33 @@ const forgotPasswordController = async(req,res)=>{
         const existUser = await User.findOne({email})
         if(!existUser) return responseHeader.error(res,'This email not exist!',404)
         const {resetPasswordLink,hashToken} = resetPasswordToken()
-        const clientUrl = `${process.env.CLIENT_URL}/reset-password?token=${resetPasswordLink}`
+        const clientUrl = `${process.env.CLIENT_URL}/reset-password/${resetPasswordLink}`
         existUser.resetPasswordToken = hashToken
         existUser.resetPasswordTokenExpireTime = Date.now() + 10 * 60 * 1000
         await existUser.save()
         sendMailToUser(email,'Reset Password Link:',existUser.fullName,clientUrl,existUser.resetPasswordTokenExpireTime)
         return responseHeader.success(res,'Reset password link send to your email','',200)
     } catch (e) {
+        return responseHeader.error(res)
+    }
+}
+// reset password controller
+const resetPasswordController = async(req,res)=>{
+    try {
+        const {newPassword} = req.body
+        const {token} = req.params
+        if(!newPassword) return responseHeader.error(res,'New password token field is required!',400)
+        if(!token) return responseHeader.error(res,'Token not found!',404)
+        const isValidToken = crypto.createHash('sha256').update(token).digest('hex')
+        const existPassword = await User.findOne({resetPasswordToken:isValidToken,resetPasswordTokenExpireTime:{$gt:Date.now()}})
+        if(!existPassword) return responseHeader.error(res,'Invalid or expire token!',400)
+        existPassword.password = newPassword
+        existPassword.resetPasswordToken = null
+        existPassword.resetPasswordTokenExpireTime = null
+        await existPassword.save()
+        return responseHeader.success(res,'Password reset successfully')
+    } catch (e) {
+        console.log(e)
         return responseHeader.error(res)
     }
 }
@@ -189,5 +210,6 @@ module.exports = {
     getAllUserByAdminController,
     logoutController,
     searchUserController,
-    forgotPasswordController
+    forgotPasswordController,
+    resetPasswordController
 }
