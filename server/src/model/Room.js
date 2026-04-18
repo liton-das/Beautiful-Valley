@@ -1,6 +1,11 @@
 const { default: mongoose } = require("mongoose");
 
 const RoomSchema = new mongoose.Schema({
+    authorId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User',
+        required:true
+    },
     title:{
         type:String,
         required:true

@@ -1,0 +1,22 @@
+const cloudinary = require('cloudinary').v2
+// Configuration
+cloudinary.config({
+  cloud_name: "dswjbopmz",
+  api_key: "466257682248234",
+  api_secret: "kdJnL-kONZqb62ICbcS8g6hXvOA", // Click 'View API Keys' above to copy your API secret
+});
+// Upload an image
+const cloudinaryUploader = async (folderName,resourceType,bufferData) => {
+  const base64 = bufferData.toString("base64")
+  const fileUrl = resourceType === "video" ? `data:video/mp4;base64,${base64}` :`data:image/jpeg;base64,${base64}`
+  const uploadResult = await cloudinary.uploader
+    .upload(fileUrl, {
+      folder:folderName,
+      resource_type:resourceType, // image or video
+      public_id : `${Date.now()}`
+    })
+    console.log(uploadResult);
+    return uploadResult.secure_url
+};
+
+module.exports = cloudinaryUploader
