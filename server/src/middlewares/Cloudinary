@@ -1,4 +1,4 @@
-const cloudinary = require('cloudinary').v2
+const cloudinary = require("cloudinary").v2;
 // Configuration
 cloudinary.config({
   cloud_name: "dswjbopmz",
@@ -9,7 +9,7 @@ cloudinary.config({
 const cloudinaryUploader = async (
   folderName,
   resourceType,
-  file // multer file object
+  file, // multer file object
 ) => {
   try {
     if (!file) throw new Error("File is required");
@@ -22,18 +22,17 @@ const cloudinaryUploader = async (
     const uploadResult = await cloudinary.uploader.upload(fileUrl, {
       folder: folderName,
       resource_type: resourceType,
-      public_id: `${Date.now()}`
+      public_id: `${Date.now()}`,
     });
 
     return {
       url: uploadResult.secure_url,
-      public_id: uploadResult.public_id
+      public_id: uploadResult.public_id,
     };
-
   } catch (error) {
     console.error("Cloudinary Error:", error.message);
     throw error;
   }
 };
 
-module.exports = cloudinaryUploader
+module.exports = cloudinaryUploader;
