@@ -83,7 +83,7 @@ const resendOtpController=async(req,res)=>{
 // login controller 
 const loginController = async(req,res)=>{
     try {
-        const {email,password}=req.body
+        const {email,password} = req.body
         if(!emailRegex.test(email)) return responseHeader.error(res,'Invalid creadintails!',400)
         if(!passwordRegex.test(password)) return responseHeader.error(res,'Invalid creadintials!',400)
         if(!email) return responseHeader.error(res,'Email field is required!',400)
