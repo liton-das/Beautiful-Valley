@@ -7,7 +7,7 @@ const roomApi = require('express').Router()
 // create room api
 roomApi.post('/create-room',authMiddleware,upload.fields([{name:'roomImage',maxCount:1},{name:'roomVideo',maxCount:1}]),createRoomPostController)
 // edit room api
-roomApi.put('/edit-room',authMiddleware,roleCheckMiddleware('admin'),upload.fields([{name:'roomImage',maxCount:1},{name:'roomVideo',maxCount:1}]),editRoomByAdminController)
+roomApi.put('/edit-room/:id',authMiddleware,roleCheckMiddleware('admin'),upload.fields([{name:'roomImage',maxCount:1},{name:'roomVideo',maxCount:1}]),editRoomByAdminController)
 
 
 
