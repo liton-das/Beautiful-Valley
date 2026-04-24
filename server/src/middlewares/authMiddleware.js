@@ -10,7 +10,6 @@ const authMiddleware = (req,res,next)=>{
         next()
     } catch (e) {
         throw new Error("Token error",e);
-        
     }
 }
 

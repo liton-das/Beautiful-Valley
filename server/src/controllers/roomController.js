@@ -128,7 +128,8 @@ const editRoomByAdminController = async (req, res) => {
     if (videoFile) {
       if (existBlog.roomVideo) {
         const existVideo = existBlog.roomVideo.split("/").pop().split(".")[0];
-        await cloudinary.uploader.destroy(`rooms/videos`,existVideo);
+        await cloudinary.uploader.destroy(`rooms/videos`,existVideo
+        );
       }
 
       videoData = await cloudinaryUploader("rooms/videos", "video", videoFile);
@@ -143,8 +144,35 @@ const editRoomByAdminController = async (req, res) => {
     return responseHeader.error(res, "Server error", 500);
   }
 };
+// get-single-room (Access only admin)
+ const getSingleRoomByAdminController = async () =>{
+  try {
+    const {id} = req.user._id
+    const page = Math.parseInt(req.query.page) || 1
+    const limit = Math.parseInt(req.query.limit) || 10
+    const skip = (page - 1) * limit
+    const totalCount = await Room.countDocuments()
+    const room = await Room.find(id).sort({createdAt:1}).limit(limit).skip(skip)
+    if(!room) return responseHeader.error(res,'Room not found!',404)
+    const simplify = {
+      room,
+      pagination:{
+        page,
+        limit,
+        skip,
+        totalItems: totalCount,
+        totalPages:Math.ceil(totalCount / limit)
+      }
+    }
+    return responseHeader.success(res,'Data fetch success')
+  } catch (e) {
+    console.log(e)
+    return responseHeader.error(res)
+  }
+ }
 
 module.exports = {
   createRoomPostController,
   editRoomByAdminController,
+  getSingleRoomByAdminController
 };
