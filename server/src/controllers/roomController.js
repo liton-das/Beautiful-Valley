@@ -206,10 +206,37 @@ const getAllRoomsListsByAdmin = async (req, res) => {
     return responseHeader.error(res);
   }
 };
+// get-all-rooms-lists (Access only User)
+const getAllRoomsLists = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalCount = await Room.countDocuments();
+    const roomLists = await Room.find({ roomStatus: 'available' }).limit(limit).skip(skip).sort({ createdAt: -1 });
+    if (!roomLists) return responseHeader.error(res, "Room lists not found!", 404);
+    const simplify = {
+      roomLists,
+      pagination: {
+        page,
+        limit,
+        skip,
+        totalItems: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    }
+    return responseHeader.success(res, "Data fetch success", simplify);
+  } catch (e) {
+    console.log(e);
+    return responseHeader.error(res);
+  }
+};
+
 module.exports = {
   createRoomPostController,
   editRoomByAdminController,
   getSingleRoomByAdminController,
   getSingleRoomBySlugController,
   getAllRoomsListsByAdmin,
+  getAllRoomsLists
 };
