@@ -117,7 +117,7 @@ const editRoomByAdminController = async (req, res) => {
     if (imageFile) {
       if (existBlog.roomImg) {
         const existImage = existBlog.roomImg.split("/").pop().split(".")[0];
-        await cloudinary.uploader.destroy(`rooms/images`,existImage);
+        await cloudinary.uploader.destroy(`rooms/images`, existImage);
       }
 
       imageData = await cloudinaryUploader("rooms/images", "image", imageFile);
@@ -128,8 +128,7 @@ const editRoomByAdminController = async (req, res) => {
     if (videoFile) {
       if (existBlog.roomVideo) {
         const existVideo = existBlog.roomVideo.split("/").pop().split(".")[0];
-        await cloudinary.uploader.destroy(`rooms/videos`,existVideo
-        );
+        await cloudinary.uploader.destroy(`rooms/videos`, existVideo);
       }
 
       videoData = await cloudinaryUploader("rooms/videos", "video", videoFile);
@@ -145,46 +144,72 @@ const editRoomByAdminController = async (req, res) => {
   }
 };
 // get-single-room (Access only admin)
- const getSingleRoomByAdminController = async (req,res) =>{
+const getSingleRoomByAdminController = async (req, res) => {
   try {
-    const {id} = req.user._id
-    const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.query.limit) || 10
-    const skip = (page - 1) * limit
-    const totalCount = await Room.countDocuments()
-    const room = await Room.find(id).sort({createdAt:1}).limit(limit).skip(skip)
-    if(!room) return responseHeader.error(res,'Room not found!',404)
+    const { id } = req.user._id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalCount = await Room.countDocuments();
+    const room = await Room.find(id).sort({ createdAt: 1 }).limit(limit).skip(skip);
+    if (!room) return responseHeader.error(res, "Room not found!", 404);
     const simplify = {
       room,
-      pagination:{
+      pagination: {
         page,
         limit,
         skip,
         totalItems: totalCount,
-        totalPages:Math.ceil(totalCount / limit)
-      }
-    }
-    return responseHeader.success(res,'Data fetch success',simplify)
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    };
+    return responseHeader.success(res, "Data fetch success", simplify);
   } catch (e) {
-    console.log(e)
-    return responseHeader.error(res)
+    console.log(e);
+    return responseHeader.error(res);
   }
- }
+};
 // get-single-room-by-slug (public api)
-const getSingleRoomBySlugController = async(req,res)=>{
+const getSingleRoomBySlugController = async (req, res) => {
   try {
-    const {slug} = req.params
-    const existRoom = await Room.find({slug})
-    if(!existRoom) return responseHeader.error(res,'Room not found!',404)
-    return responseHeader.success(res,'Data fetch success',existRoom)  
+    const { slug } = req.params;
+    const existRoom = await Room.find({ slug });
+    if (!existRoom) return responseHeader.error(res, "Room not found!", 404);
+    return responseHeader.success(res, "Data fetch success", existRoom);
   } catch (e) {
-    console.log(e)
-    return responseHeader.error(res)
+    console.log(e);
+    return responseHeader.error(res);
   }
-}
+};
+// get-all-rooms-lists (Access only admin)
+const getAllRoomsListsByAdmin = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalCount = await Room.countDocuments();
+    const roomLists = await Room.find().limit(limit).skip(skip).sort({ createdAt: -1 });
+    if (!roomLists) return responseHeader.error(res, "Room lists not found!", 404);
+    const simplify = {
+      roomLists,
+      pagination: {
+        page,
+        limit,
+        skip,
+        totalItems: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    }
+    return responseHeader.success(res, "Data fetch success", simplify);
+  } catch (e) {
+    console.log(e);
+    return responseHeader.error(res);
+  }
+};
 module.exports = {
   createRoomPostController,
   editRoomByAdminController,
   getSingleRoomByAdminController,
-  getSingleRoomBySlugController
+  getSingleRoomBySlugController,
+  getAllRoomsListsByAdmin,
 };

@@ -1,4 +1,4 @@
-const { createRoomPostController, editRoomByAdminController, getSingleRoomByAdminController, getSingleRoomBySlugController } = require('../../controllers/roomController')
+const { createRoomPostController, editRoomByAdminController, getSingleRoomByAdminController, getSingleRoomBySlugController, getAllRoomsListsByAdmin } = require('../../controllers/roomController')
 const multer = require('multer')
 const { authMiddleware } = require('../../middlewares/authMiddleware')
 const roleCheckMiddleware = require('../../middlewares/roleCheckMiddleware')
@@ -12,7 +12,8 @@ roomApi.put('/edit-room/:id',authMiddleware,roleCheckMiddleware('admin'),upload.
 roomApi.get('/get-single-room-by-admin',authMiddleware,roleCheckMiddleware('admin'),getSingleRoomByAdminController)
 // get room by slug (public api)
 roomApi.get('/get-room-by-slug/:slug',getSingleRoomBySlugController)
-
+// get room lists by admin api
+roomApi.get('/get-room-lists-by-admin/all',authMiddleware,roleCheckMiddleware('admin'),getAllRoomsListsByAdmin)
 
 
 module.exports=roomApi
