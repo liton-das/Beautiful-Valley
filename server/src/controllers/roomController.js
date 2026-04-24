@@ -145,11 +145,11 @@ const editRoomByAdminController = async (req, res) => {
   }
 };
 // get-single-room (Access only admin)
- const getSingleRoomByAdminController = async () =>{
+ const getSingleRoomByAdminController = async (req,res) =>{
   try {
     const {id} = req.user._id
-    const page = Math.parseInt(req.query.page) || 1
-    const limit = Math.parseInt(req.query.limit) || 10
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
     const skip = (page - 1) * limit
     const totalCount = await Room.countDocuments()
     const room = await Room.find(id).sort({createdAt:1}).limit(limit).skip(skip)
@@ -164,15 +164,27 @@ const editRoomByAdminController = async (req, res) => {
         totalPages:Math.ceil(totalCount / limit)
       }
     }
-    return responseHeader.success(res,'Data fetch success')
+    return responseHeader.success(res,'Data fetch success',simplify)
   } catch (e) {
     console.log(e)
     return responseHeader.error(res)
   }
  }
-
+// get-single-room-by-slug (public api)
+const getSingleRoomBySlugController = async(req,res)=>{
+  try {
+    const {slug} = req.params
+    const existRoom = await Room.find({slug})
+    if(!existRoom) return responseHeader.error(res,'Room not found!',404)
+    return responseHeader.success(res,'Data fetch success',existRoom)  
+  } catch (e) {
+    console.log(e)
+    return responseHeader.error(res)
+  }
+}
 module.exports = {
   createRoomPostController,
   editRoomByAdminController,
-  getSingleRoomByAdminController
+  getSingleRoomByAdminController,
+  getSingleRoomBySlugController
 };
