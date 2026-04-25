@@ -3,6 +3,8 @@ import Home from './pages/client-pages/Home';
 import DashboardLayoutes from './layoutes/DashboardLayoutes';
 import ClientLayoute from './layoutes/ClientLayoute';
 import Dashboard from './pages/dashboard-pages/Dashboard';
+import Register from './pages/client-pages/auth/Register';
+import Login from './pages/client-pages/auth/Login';
 
 export default function App() {
   const router = createBrowserRouter(createRoutesFromElements(
@@ -17,6 +19,9 @@ export default function App() {
             <Route index element={<Dashboard/>}/>
         </Route>
       </Route>
+      {/* Auth */}
+      <Route path='/register' element={<Register/>}/>
+      <Route path='/login' element={<Login/>}/>
     </Route>
   ))
   
