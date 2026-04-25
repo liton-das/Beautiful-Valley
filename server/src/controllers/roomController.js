@@ -231,12 +231,24 @@ const getAllRoomsLists = async (req, res) => {
     return responseHeader.error(res);
   }
 };
-
+// search room by slug controller 
+const searchRoomController = async(req,res)=>{
+  try {
+    const {searchItems} = req.params
+    const items = await Room.find({$or:[{title:{$regex:searchItems,$options:"i"}},{slug:{$regex:searchItems,$options:"i"}}]})
+    if(!items)return responseHeader.error(res,"Search result not found!",404)
+    return responseHeader.success(res,'Fetch search items successfully',{data:items})
+  } catch (e) {
+    console.log(e)
+    return responseHeader.error(res)
+  }
+}
 module.exports = {
   createRoomPostController,
   editRoomByAdminController,
   getSingleRoomByAdminController,
   getSingleRoomBySlugController,
   getAllRoomsListsByAdmin,
-  getAllRoomsLists
+  getAllRoomsLists,
+  searchRoomController
 };
