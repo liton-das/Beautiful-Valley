@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router";
 const Navbar = () => {
       const [menuOpen, setMenuOpen] = useState(false);
   return (
@@ -20,7 +21,7 @@ const Navbar = () => {
           <span className="cursor-pointer hover:text-gray-300">Home</span>
           <span className="cursor-pointer hover:text-gray-300">Rooms</span>
           <span className="cursor-pointer hover:text-gray-300">Contact</span>
-          <button className="bg-purple-600 px-3 py-1 rounded-lg text-sm">Login</button>
+          <Link to={'/login'} className="bg-purple-600 px-3 py-1 rounded-lg text-sm">Login</Link>
         </div>
 
         {/* Mobile Hamburger */}
