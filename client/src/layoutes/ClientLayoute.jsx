@@ -1,7 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router'
 
-const DashboardLayoutes = () => {
+const ClientLayoute = () => {
   return (
     <>
       <Outlet/>
@@ -9,4 +9,4 @@ const DashboardLayoutes = () => {
   )
 }
 
-export default DashboardLayoutes
+export default ClientLayoute
