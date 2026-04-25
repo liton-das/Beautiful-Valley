@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useGetAllRoomListsQuery } from "./services/api";
 
 const rooms = [
   {
@@ -30,7 +31,8 @@ const rooms = [
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const {data,isLoading} = useGetAllRoomListsQuery()
+  console.log(data)
   return (
     <div className="bg-gray-950 text-white flex flex-col min-h-screen">
       {/* Navbar */}
