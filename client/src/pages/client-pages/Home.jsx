@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGetRoomsQuery } from "../../services/api";
+import Loading from "../../components/Loading";
 
 const rooms = [
   {
@@ -39,7 +40,7 @@ const Home = () => {
   const rooms = data?.data?.roomLists || [];
 console.log(rooms)
    if (isLoading) {
-     return <h1>Loading...</h1>;
+     return <Loading/>
    }
   return (
     <div className="bg-gray-950 text-white flex flex-col min-h-screen">
@@ -79,17 +80,14 @@ console.log(rooms)
 
       {/* Rooms */}
       <main className="flex-1 px-4 mt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10">
           {rooms.map((room) => (
             <motion.div
               key={room?._id}
               whileHover={{ scale: 1.04 }}
               className="bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
             >
-              {/* room status  */}
-              <div className="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full z-10">
-                <button>{room?.roomStatus || "Available"}</button>
-              </div>
+              
               {
                 room?.mediaType === "image" ? (
                   <img src={room?.media} alt={room?.title} className="w-full h-44 object-cover" />
@@ -100,7 +98,19 @@ console.log(rooms)
                 )
               }
               <div className="p-4">
-                <h2 className="text-lg font-semibold">{room?.title}</h2>
+                {/* flex title and status  */}
+                <div className="flex items-center justify-between hover:text-purple-400 transition-colors duration-300">
+                  <h2 className="text-lg font-semibold">{room?.title}</h2>
+                  <span
+                    className={`text-xs font-medium px-2 py-1 rounded-full ${
+                      room?.roomStatus === "available"
+                        ? "bg-green-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {room?.roomStatus || "Available"}
+                  </span>
+                </div>
 
                 <div className="flex items-center gap-2 mt-1">
                   <span className="line-through text-gray-500 text-sm">${room?.discount}</span>
@@ -110,6 +120,8 @@ console.log(rooms)
                 <button className="mt-3 w-full bg-linear-to-r from-purple-500 to-pink-500 py-2 rounded-xl text-sm">
                   Book Now
                 </button>
+                {/* room status  */}
+              
               </div>
             </motion.div>
           ))}

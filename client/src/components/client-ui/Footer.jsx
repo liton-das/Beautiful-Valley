@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <>
       {/* Footer */}
-      <footer className="mt-10 border-t border-gray-800 px-4 py-10 bg-gray-900 text-gray-300">
+      <footer className="mt-8 border-t border-gray-800 px-4 py-10 bg-gray-900 text-gray-300">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
           {/* Brand */}
           <div>
