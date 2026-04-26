@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 import Inputs from "../../../components/client-ui/Inputs";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
+import { useLoginMutation } from "../../../services/api";
+import Loading from "../../../components/Loading";
 const INITIAL_VALUE = {
-  fullName: "",
   email: "",
-  phone: "",
   password: "",
 };
 const Login = () => {
   const [inputFields, setInputFields] = useState({ ...INITIAL_VALUE });
+  const [login, { isLoading }] = useLoginMutation();
+  if(isLoading){
+    return <Loading />;
+  }
   // handleChange
   const handleChange = (e) => {
     setInputFields((prev) => ({
@@ -18,6 +22,21 @@ const Login = () => {
       [e.target.name]: e.target.value,
     }));
   };
+  // handleSubmit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await login(inputFields).unwrap();
+      <Navigate to={'/dashboard'}/>
+      setInputFields({ ...INITIAL_VALUE });
+      // Handle successful login, e.g., store token, redirect, etc.
+    } catch (error) {
+      console.error("Login failed:", error);
+      setInputFields({ ...INITIAL_VALUE });
+      // Handle login error, e.g., show error message to user
+    }
+  };
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-950 via-gray-900 to-black px-4">
       <motion.div
@@ -32,7 +51,7 @@ const Login = () => {
         </h2>
 
         {/* Form */}
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div className="flex items-center bg-gray-800 rounded-lg px-3">
             <FaEnvelope className="text-gray-400" />

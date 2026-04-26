@@ -3,11 +3,15 @@ export const roomApi = createApi({
     reducerPath:'api',
     baseQuery:fetchBaseQuery({baseUrl:`http://localhost:8080/auth/v1/`,credentials:'include'}),
     endpoints:(builder)=>({
-        // get all room lists 
-        getAllRoomLists: builder.query({
-            query:()=>`get-single-user`
+        // login
+        login:builder.mutation({
+            query:(data)=>({
+                url:'login',
+                method:'POST',
+                body:data
+            })
         })
     })
-})
+});
 
-export const {useGetAllRoomListsQuery} = roomApi
+export const {useLoginMutation} = roomApi

@@ -7,10 +7,10 @@ const router = require('./src/routes')
 const app = express()
 require('dotenv').config()
 const PORT = process.env.PORT || 4000
-app.use(express.json())
+app.use(express.json()) 
 app.use(cookieParser())
 app.use(cors({
-    origin:'http://localhost:5173/',
+    origin:'http://localhost:5173',
     credentials:true
 }))
 // Db connection 
