@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useGetRoomsQuery } from "../../services/api";
 
 const rooms = [
   {
@@ -29,6 +30,17 @@ const rooms = [
 ];
 const Home = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  // page 
+  const [page, setPage] = useState(1);
+  // limit per page
+  const [limit, setLimit] = useState(6);
+  // get api data using RTK query
+  const { data, error, isLoading } = useGetRoomsQuery({ page, limit });
+  const rooms = data?.data?.roomLists || [];
+console.log(rooms)
+   if (isLoading) {
+     return <h1>Loading...</h1>;
+   }
   return (
     <div className="bg-gray-950 text-white flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -70,23 +82,30 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {rooms.map((room) => (
             <motion.div
-              key={room.id}
+              key={room?._id}
               whileHover={{ scale: 1.04 }}
               className="bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
             >
-              <img src={room.image} alt={room.title} className="w-full h-44 object-cover" />
-
+              {/* room status  */}
+              <div className="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full z-10">
+                <button>{room?.roomStatus || "Available"}</button>
+              </div>
+              {
+                room?.mediaType === "image" ? (
+                  <img src={room?.media} alt={room?.title} className="w-full h-44 object-cover" />
+                ) : (
+                  <video controls className="w-full h-44 object-cover">
+                    <source src={room?.media} type="video/mp4" />
+                  </video>
+                )
+              }
               <div className="p-4">
-                <h2 className="text-lg font-semibold">{room.title}</h2>
+                <h2 className="text-lg font-semibold">{room?.title}</h2>
 
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="line-through text-gray-500 text-sm">${room.price}</span>
-                  <span className="text-green-400 font-bold">${room.discount}</span>
+                  <span className="line-through text-gray-500 text-sm">${room?.discount}</span>
+                  <span className="text-green-400 font-bold">${room?.price}</span>
                 </div>
-
-                <video controls className="mt-3 rounded-lg w-full h-36 object-cover">
-                  <source src={room.video} type="video/mp4" />
-                </video>
 
                 <button className="mt-3 w-full bg-linear-to-r from-purple-500 to-pink-500 py-2 rounded-xl text-sm">
                   Book Now

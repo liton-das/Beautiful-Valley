@@ -5,7 +5,8 @@ const { slugGenerator } = require("../utils/slugGenerator");
 const cloudinary = require("cloudinary").v2;
 // create room post controller
 const createRoomPostController = async (req, res) => {
-  const authorId = req.user._id;
+  try {
+    const authorId = req.user._id;
   const {
     title,
     roomNumber,
@@ -15,12 +16,14 @@ const createRoomPostController = async (req, res) => {
     discount,
     bookingDate,
     bookingCancelDate,
+    mediaType
   } = req.body;
   if (!title) return responseHeader.error(res, "Title field is required!", 400);
   if (!roomNumber) return responseHeader.error(res, "Room number field is required!", 400);
   if (!roomStatus) return responseHeader.error(res, "Room Status field is required!", 400);
   if (!description) return responseHeader.error(res, "Description Status field is required!", 400);
   if (!price) return responseHeader.error(res, "Price Status field is required!", 400);
+  if (!mediaType) return responseHeader.error(res, "Media type field is required!", 400);
   const slug = slugGenerator(title);
   const existBlog = await Room.findOne({ slug });
   if (existBlog) return responseHeader.error(res, "This blog already created!", 400);
@@ -32,15 +35,10 @@ const createRoomPostController = async (req, res) => {
       return responseHeader.error(res, "Booking cancel date must be after booking date", 400);
     }
   }
-  const imageFile = req.files?.roomImage?.[0];
-  const videoFile = req.files?.roomVideo?.[0];
-  let imageData = "";
-  let videoData = "";
-  if (imageFile) {
-    imageData = await cloudinaryUploader("rooms/images", "image", imageFile);
-  }
-  if (videoFile) {
-    videoData = await cloudinaryUploader("rooms/videos", "video", videoFile);
+  
+  let mediaUrl;
+  if(req.file){
+     mediaUrl = await cloudinaryUploader(mediaType === "image" ? "rooms/images" : "rooms/videos",req.file);
   }
   const createRoom = new Room({
     title,
@@ -54,11 +52,15 @@ const createRoomPostController = async (req, res) => {
     finalPrice,
     bookingDate: bookingDate ? new Date(bookingDate) : null,
     bookingCancelDate: bookingCancelDate ? new Date(bookingCancelDate) : null,
-    roomImg: imageData?.url,
-    roomVideo: videoData?.url,
+    mediaType,
+    media: mediaUrl
   });
   await createRoom.save();
   return responseHeader.success(res, "Room created successfully", createRoom);
+  } catch (e) {
+    console.log(e);
+    return responseHeader.error(res);
+  }
 };
 // edit room by admin
 const editRoomByAdminController = async (req, res) => {
@@ -73,6 +75,7 @@ const editRoomByAdminController = async (req, res) => {
       discount,
       bookingDate,
       bookingCancelDate,
+      mediaType
     } = req.body;
 
     const existBlog = await Room.findById(id);
@@ -82,7 +85,7 @@ const editRoomByAdminController = async (req, res) => {
       existBlog.title = title;
       existBlog.slug = slugGenerator(title);
     }
-
+    if (mediaType) existBlog.mediaType = mediaType;
     if (roomNumber) existBlog.roomNumber = roomNumber;
     if (roomStatus) existBlog.roomStatus = roomStatus;
     if (description) existBlog.description = description;
@@ -107,33 +110,16 @@ const editRoomByAdminController = async (req, res) => {
       existBlog.bookingCancelDate = end;
     }
 
-    const imageFile = req.files?.roomImage?.[0];
-    const videoFile = req.files?.roomVideo?.[0];
-
-    let imageData = null;
-    let videoData = null;
-
-    // IMAGE
-    if (imageFile) {
-      if (existBlog.roomImg) {
-        const existImage = existBlog.roomImg.split("/").pop().split(".")[0];
-        await cloudinary.uploader.destroy(`rooms/images`, existImage);
-      }
-
-      imageData = await cloudinaryUploader("rooms/images", "image", imageFile);
-      existBlog.roomImg = imageData.url || imageData;
+    let mediaUrl;
+  if(req.file){
+    // Delete old media from Cloudinary
+    if (existBlog.media) {
+      const publicId = existBlog.media.split("/").pop().split(".")[0]; // Extract public ID from URL
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'auto' });
     }
-
-    // VIDEO
-    if (videoFile) {
-      if (existBlog.roomVideo) {
-        const existVideo = existBlog.roomVideo.split("/").pop().split(".")[0];
-        await cloudinary.uploader.destroy(`rooms/videos`, existVideo);
-      }
-
-      videoData = await cloudinaryUploader("rooms/videos", "video", videoFile);
-      existBlog.roomVideo = videoData.url || videoData;
-    }
+     mediaUrl = await cloudinaryUploader(mediaType === "image" ? "rooms/images" : "rooms/videos",req.file);
+  }
+    if (mediaUrl) existBlog.media = mediaUrl;
 
     await existBlog.save();
 

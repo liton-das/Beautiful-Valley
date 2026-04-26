@@ -21,7 +21,9 @@ const Navbar = () => {
                 <span className="cursor-pointer hover:text-gray-300">Home</span>
                 <span className="cursor-pointer hover:text-gray-300">Rooms</span>
                 <span className="cursor-pointer hover:text-gray-300">Contact</span>
-                <button className="bg-purple-600 px-3 py-1 rounded-lg text-sm">Login</button>
+                <Link to={'/login'} className="bg-purple-600 px-3 py-1 rounded-lg text-sm text-white font-semibold hover:bg-purple-700">
+                  Login
+                </Link>
               </div>
       
               {/* Mobile Hamburger */}

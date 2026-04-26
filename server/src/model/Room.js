@@ -25,13 +25,14 @@ const RoomSchema = new mongoose.Schema({
         enum:['available','booked','calcel'],
         default:'available'
     },
-    roomImg:{
+    mediaType:{
         type:String,
-        default:null
+        enum:['image','video'],
+        required:true
     },
-    roomVideo:{
+    media:{
         type:String,
-        default:null
+        required:true
     },
     description:{
         type:String,
